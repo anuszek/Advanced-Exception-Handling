@@ -52,7 +52,6 @@ public class Main {
                 "== " + " 4   5   6   * " + " ==" + "\n" +
                 "== " + " 1   2   3   + " + " ==" + "\n" +
                 "== " + " .   0   ^   - " +  " ==" + "\n" +
-                "== " + " sqrt  c  entr " +  " ==" + "\n" +
                 "=====================" + "\n";
 
         System.out.println("\n\nSmart Calculator\n\n" +
@@ -111,10 +110,10 @@ public class Main {
             throw new InvalidInputError("Empty expression");
         }
 
-        // Check for invalid characters
-//        if (!input.matches("^[0-9+\\-*/.^()\\s]*$")) {
-//            throw new InvalidInputError("Contains invalid characters");
-//        }
+        // Allow numbers, operators, and parentheses
+        if (!input.matches("^[0-9+\\-*/.^()\\s]*$")) {
+            throw new InvalidInputError("Contains invalid characters");
+        }
     }
 
     private static double evaluateExpression(String input) throws CalculatorError {
@@ -133,42 +132,54 @@ public class Main {
         }
     }
 
-    private static String infixToPostfix(String infix) throws ParenthesisMismatchError {
-        // Implementation of Shunting-yard algorithm
+    private static String infixToPostfix(String infix) throws ParenthesisMismatchError, InvalidInputError {
         StringBuilder output = new StringBuilder();
-        Stack<Character> stack = new Stack<>();
+        Stack<String> stack = new Stack<>();
+        String[] tokens = infix.replaceAll("\\s+", "").split("(?<=[-+*/^()])|(?=[-+*/^()])");
 
-        for (char token : infix.replaceAll("\\s+", "").toCharArray()) {
-            if (Character.isDigit(token) || token == '.') {
-                output.append(token);
-            } else if (isOperator(token)) {
-                output.append(' ');
-                while (!stack.isEmpty() && isOperator(stack.peek()) &&
-                        precedence(token) <= precedence(stack.peek())) {
+        for (int i = 0; i < tokens.length; i++) {
+            String token = tokens[i];
+
+            if (token.matches("[0-9]+(\\.[0-9]+)?")) {
+                // If the token is a number, add it to the output
+                output.append(token).append(' ');
+            } else if (token.equals("-") && (i == 0 || tokens[i - 1].equals("(") || isOperator(tokens[i - 1].charAt(0)))) {
+                // Handle negative numbers (e.g., -2)
+                if (i + 1 < tokens.length && tokens[i + 1].matches("[0-9]+(\\.[0-9]+)?")) {
+                    output.append(token).append(tokens[++i]).append(' ');
+                } else {
+                    throw new InvalidInputError("Invalid negative number format");
+                }
+            } else if (isOperator(token.charAt(0))) {
+                // Handle operators
+                while (!stack.isEmpty() && isOperator(stack.peek().charAt(0)) &&
+                        precedence(token.charAt(0)) <= precedence(stack.peek().charAt(0))) {
                     output.append(stack.pop()).append(' ');
                 }
                 stack.push(token);
-            } else if (token == '(') {
+            } else if (token.equals("(")) {
                 stack.push(token);
-            } else if (token == ')') {
-                while (!stack.isEmpty() && stack.peek() != '(') {
-                    output.append(' ').append(stack.pop());
+            } else if (token.equals(")")) {
+                while (!stack.isEmpty() && !stack.peek().equals("(")) {
+                    output.append(stack.pop()).append(' ');
                 }
                 if (stack.isEmpty()) {
                     throw new ParenthesisMismatchError();
                 }
-                stack.pop(); // Remove '(' from stack
+                stack.pop(); // Remove '('
+            } else {
+                throw new InvalidInputError("Unknown token: " + token);
             }
         }
 
         while (!stack.isEmpty()) {
-            if (stack.peek() == '(') {
+            if (stack.peek().equals("(")) {
                 throw new ParenthesisMismatchError();
             }
-            output.append(' ').append(stack.pop());
+            output.append(stack.pop()).append(' ');
         }
 
-        return output.toString();
+        return output.toString().trim();
     }
 
     private static double evaluatePostfix(String postfix) throws CalculatorError {
@@ -176,9 +187,7 @@ public class Main {
         String[] tokens = postfix.split("\\s+");
 
         for (String token : tokens) {
-            if (token.isEmpty()) continue;
-
-            if (token.matches("[0-9]+(\\.[0-9]+)?")) {
+            if (token.matches("-?[0-9]+(\\.[0-9]+)?")) { // Match both positive and negative numbers
                 stack.push(Double.parseDouble(token));
             } else if (isOperator(token.charAt(0))) {
                 if (stack.size() < 2) {
@@ -186,17 +195,7 @@ public class Main {
                 }
                 double b = stack.pop();
                 double a = stack.pop();
-                double result = performOperation(a, b, token.charAt(0));
-                stack.push(result);
-            } else if (token.equals("sqrt")) {
-                if (stack.isEmpty()) {
-                    throw new InvalidInputError("No operand for square root");
-                }
-                double a = stack.pop();
-                if (a < 0) {
-                    throw new NegativeRootError();
-                }
-                stack.push(Math.sqrt(a));
+                stack.push(performOperation(a, b, token.charAt(0)));
             } else {
                 throw new InvalidInputError("Unknown token: " + token);
             }
@@ -240,11 +239,6 @@ public class Main {
                     throw new OverflowError("exponentiation");
                 }
                 return power;
-            case 's':
-                if (a < 0) {
-                    throw new NegativeRootError();
-                }
-                return Math.sqrt(a);
             default:
                 throw new CalculatorError("Unknown operator: " + op);
         }
