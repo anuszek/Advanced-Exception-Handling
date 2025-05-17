@@ -188,17 +188,6 @@ public class Main {
                 double a = stack.pop();
                 double result = performOperation(a, b, token.charAt(0));
                 stack.push(result);
-            } else if (token.equals("^")) {
-                if (stack.size() < 2) {
-                    throw new InvalidInputError("Insufficient operands for operator " + token);
-                }
-                double b = stack.pop();
-                double a = stack.pop();
-                double result = Math.pow(a, b);
-                if (Double.isInfinite(result)) {
-                    throw new OverflowError("exponentiation");
-                }
-                stack.push(result);
             } else if (token.equals("sqrt")) {
                 if (stack.isEmpty()) {
                     throw new InvalidInputError("No operand for square root");
@@ -208,6 +197,8 @@ public class Main {
                     throw new NegativeRootError();
                 }
                 stack.push(Math.sqrt(a));
+            } else {
+                throw new InvalidInputError("Unknown token: " + token);
             }
         }
 
@@ -260,7 +251,7 @@ public class Main {
     }
 
     private static boolean isOperator(char c) {
-        return c == '+' || c == '-' || c == '*' || c == '/';
+        return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
     }
 
     private static int precedence(char op) {
