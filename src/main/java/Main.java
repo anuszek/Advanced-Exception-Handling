@@ -6,19 +6,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import java.util.Stack;
 
-// Custom exception hierarchy
+// Custom exception hierarchy - Base class for all calculator exceptions
 class CalculatorError extends Exception {
     public CalculatorError(String message) {
         super(message);
     }
 }
 
+// Input validation exceptions
 class InvalidInputError extends CalculatorError {
     public InvalidInputError(String input) {
         super("Invalid input: " + input);
     }
 }
 
+// Math operation exceptions
 class DivisionByZeroError extends CalculatorError {
     public DivisionByZeroError() {
         super("Division by zero is not allowed");
@@ -31,12 +33,14 @@ class NegativeRootError extends CalculatorError {
     }
 }
 
+// Syntax exceptions
 class ParenthesisMismatchError extends CalculatorError {
     public ParenthesisMismatchError() {
         super("Mismatched parentheses in expression");
     }
 }
 
+// Arithmetic exceptions
 class OverflowError extends CalculatorError {
     public OverflowError(String operation) {
         super("Overflow occurred during " + operation);
@@ -44,6 +48,9 @@ class OverflowError extends CalculatorError {
 }
 
 public class Main {
+    // Logger for error logging
+    private static final String LOG_FILE = "calculator_errors.log";
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         String calculator = "=====================" + "\n" +
@@ -57,6 +64,7 @@ public class Main {
         System.out.println("\n\nSmart Calculator\n\n" +
                 calculator +
                 "'q' to quit");
+
         while (true) {
             System.out.print("Enter an input: ");
             String input = scanner.nextLine();
@@ -74,36 +82,61 @@ public class Main {
                 try {
                     validateInput(input);
                 } catch (InvalidInputError e) {
+                    logError(e); // Error logging
                     System.out.println("Input Error: " + e.getMessage());
                     continue;
                 }
+
                 // Second try block for evaluation
                 double result = 0;
                 try {
                     result = evaluateExpression(input);
                 } catch (DivisionByZeroError e) {
+                    logError(e);
                     System.out.println("Math Error: " + e.getMessage());
                     continue;
                 } catch (OverflowError | NegativeRootError e) {
+                    // Capture multiple exceptions in one catch block
+                    logError(e);
                     System.out.println("Math Error: " + e.getMessage());
                     continue;
                 } catch (ParenthesisMismatchError e) {
+                    logError(e);
                     System.out.println("Syntax Error: " + e.getMessage());
                     continue;
                 } catch (CalculatorError e) {
+                    logError(e);
                     System.out.println("Calculation Error: " + e.getMessage());
                     continue;
                 }
+
                 // Else block executes when no exceptions occur
                 System.out.println("Result: " + result);
-           } finally {
+
+            } finally {
                 // This block always executes for cleanup
                 System.out.println("Calculation attempt completed");
+
+                // Interactive debugging - could be enhanced with a debug flag
+                if (System.getProperty("debug") != null) {
+                    System.out.println("[DEBUG] Current expression: " + input);
+                }
             }
         }
         scanner.close();
     }
 
+    // Error logging method
+    private static void logError(Exception e) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(LOG_FILE, true))) {
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            writer.println(timestamp + " - " + e.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (IOException ioException) {
+            System.err.println("Failed to log error: " + ioException.getMessage());
+        }
+    }
+
+    // Input validation with assertions and regex checks
     private static void validateInput(String input) throws InvalidInputError {
         // Check for empty input
         if (input.trim().isEmpty()) {
@@ -114,8 +147,14 @@ public class Main {
         if (!input.matches("^[0-9+\\-*/.^()\\s]*$")) {
             throw new InvalidInputError("Contains invalid characters");
         }
+
+        // Additional validation for expression structure
+        if (input.matches(".*[+\\-*/^]{2,}.*")) {
+            throw new InvalidInputError("Consecutive operators");
+        }
     }
 
+    // Main evaluation method with exception handling for mathematical expressions
     private static double evaluateExpression(String input) throws CalculatorError {
         try {
             // Convert to postfix notation
@@ -127,11 +166,16 @@ public class Main {
             // Convert standard Java exceptions to our custom exceptions
             if (e.getMessage().contains("/ by zero")) {
                 throw new DivisionByZeroError();
+            } else if (e.getMessage().contains("negative")) {
+                throw new NegativeRootError();
             }
             throw new CalculatorError(e.getMessage());
+        } catch (NumberFormatException e) {
+            throw new InvalidInputError("Invalid number format");
         }
     }
 
+    // Converts infix to postfix notation with parenthesis validation
     private static String infixToPostfix(String infix) throws ParenthesisMismatchError, InvalidInputError {
         StringBuilder output = new StringBuilder();
         Stack<String> stack = new Stack<>();
@@ -151,7 +195,7 @@ public class Main {
                     throw new InvalidInputError("Invalid negative number format");
                 }
             } else if (isOperator(token.charAt(0))) {
-                // Handle operators
+                // Handle operators with precedence
                 while (!stack.isEmpty() && isOperator(stack.peek().charAt(0)) &&
                         precedence(token.charAt(0)) <= precedence(stack.peek().charAt(0))) {
                     output.append(stack.pop()).append(' ');
@@ -182,6 +226,7 @@ public class Main {
         return output.toString().trim();
     }
 
+    // Evaluates postfix expression with stack operations
     private static double evaluatePostfix(String postfix) throws CalculatorError {
         Stack<Double> stack = new Stack<>();
         String[] tokens = postfix.split("\\s+");
@@ -208,6 +253,7 @@ public class Main {
         return stack.pop();
     }
 
+    // Performs mathematical operations with overflow checks
     private static double performOperation(double a, double b, char op) throws CalculatorError {
         switch (op) {
             case '+':
@@ -234,6 +280,9 @@ public class Main {
                 }
                 return a / b;
             case '^':
+                if (a < 0 && b != (int)b) {
+                    throw new NegativeRootError();
+                }
                 double power = Math.pow(a, b);
                 if (Double.isInfinite(power)) {
                     throw new OverflowError("exponentiation");
@@ -244,6 +293,7 @@ public class Main {
         }
     }
 
+    // Helper methods
     private static boolean isOperator(char c) {
         return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
     }
@@ -256,6 +306,8 @@ public class Main {
             case '*':
             case '/':
                 return 2;
+            case '^':
+                return 3;
             default:
                 return 0;
         }

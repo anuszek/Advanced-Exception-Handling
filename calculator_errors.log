@@ -1,0 +1,4 @@
+2025-05-19T13:47:35.1464468 - InvalidInputError: Invalid input: Contains invalid characters
+2025-05-19T13:48:43.0031174 - ParenthesisMismatchError: Mismatched parentheses in expression
+2025-05-19T13:48:53.3805035 - InvalidInputError: Invalid input: Invalid expression
+2025-05-19T13:59:15.2668308 - OverflowError: Overflow occurred during exponentiation
