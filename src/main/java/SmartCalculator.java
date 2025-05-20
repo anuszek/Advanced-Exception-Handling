@@ -47,7 +47,7 @@ class OverflowError extends CalculatorError {
     }
 }
 
-public class Main {
+public class SmartCalculator {
     // Logger for error logging
     private static final String LOG_FILE = "calculator_errors.log";
 
