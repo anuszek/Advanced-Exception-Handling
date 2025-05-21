@@ -1,5 +1,9 @@
-//// Task: Complete the catch block to handle both ArithmeticException and NullPointerException
-//
+// ## Zadanie 1
+
+// **Polecenie:**  
+// Uzupełnij obsługę błędów w pliku `MultiCatch.java`,
+// stosując odpowiedni blok `catch` dla wyjątków
+// klas ArithmeticException oraz NullPointerException.
 //public class MultiCatch {
 //    public static void main(String[] args) {
 //        try {

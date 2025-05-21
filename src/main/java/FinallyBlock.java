@@ -1,7 +1,12 @@
-//import java.util.Scanner;
-//import java.util.InputMismatchException;
+import java.util.Scanner;
+import java.util.InputMismatchException;
 //
-//// Task: Add a finally block to close the Scanner
+// ## Zadanie 2
+
+// **Polecenie:**  
+// Uzupełnij blok `finally` oraz kod w pliku `FinallyBlock.java`,
+// aby obiekt `scanner` został zamknięty.
+//
 //
 //public class FinallyBlock {
 //    public static void main(String[] args) {

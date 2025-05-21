@@ -1,5 +1,9 @@
-//// Task: Complete the code to throw a custom exception if balance is negative
-//
+// ## Zadanie 3
+
+// **Polecenie:**  
+// Zmodyfikuj kod w pliku `BankAccount.java`, aby w przypadku ujemnego salda konta zgłaszany był własny wyjątek użytkownika.
+
+// ---
 //class InsufficientBalanceException extends ______ {
 //   public InsufficientBalanceException(String message) {
 //       ______;
