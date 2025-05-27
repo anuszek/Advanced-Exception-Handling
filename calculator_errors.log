@@ -4,3 +4,5 @@
 2025-05-19T13:59:15.2668308 - OverflowError: Overflow occurred during exponentiation
 2025-05-21T11:27:50.966589 - DivisionByZeroError: Division by zero is not allowed
 2025-05-21T11:28:02.850417 - OverflowError: Overflow occurred during exponentiation
+2025-05-22T21:27:07.3298032 - DivisionByZeroError: Division by zero is not allowed
+2025-05-22T21:27:22.2984736 - OverflowError: Overflow occurred during exponentiation

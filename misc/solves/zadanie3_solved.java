@@ -16,8 +16,9 @@ class BankAccount {
 
     public static void main(String[] args) {
         BankAccount account = new BankAccount();
+        // Test insufficient balance
         try {
-            account.withdraw(150.0); // Test insufficient balance
+            account.withdraw(150.0);
         } catch (InsufficientBalanceException e) {
             System.out.println("Error: " + e.getMessage());
         }
