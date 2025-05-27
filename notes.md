@@ -1,1 +1,0 @@
-1. zadanie na napisanie wlasnego loggera
