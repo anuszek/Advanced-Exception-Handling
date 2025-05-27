@@ -1,5 +1,3 @@
-# ZADANIA
-
 ## Zadanie 1
 
 **Polecenie:**  
@@ -18,5 +16,19 @@ Uzupełnij blok `finally` oraz kod w pliku `FinallyBlock.java`, aby obiekt `scan
 
 **Polecenie:**  
 Zmodyfikuj kod w pliku `BankAccount.java`, aby w przypadku ujemnego salda konta zgłaszany był własny wyjątek użytkownika.
+
+---
+
+## Zadanie 4
+
+**Polecenie:** 
+Uzupełnij plik `InputValidatorWithLogging.java`, aby obsługiwał wyjątki i logował błędy do pliku `errors.log`. 
+
+---
+
+## Zadanie 5
+
+**Polecenie:**
+Zaimplementuj API, szkielet kodu oraz szczegółowe polecenia znajdziesz w pliku `RestApiGlobalExceptionHandling.java`
 
 ---
