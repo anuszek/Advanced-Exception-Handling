@@ -1,4 +1,7 @@
-// Task: Complete the code to throw a custom exception if balance is negative
+ // Zadanie 3
+ // Uzupełnij kod, aby w przypadku ujemnego salda konta zgłaszany
+ // był własny wyjątek.
+
 
 class InsufficientBalanceException extends ______ {
    public InsufficientBalanceException(String message) {
@@ -14,4 +17,10 @@ class BankAccount {
        }
        balance -= amount;
    }
+
+    public static void main(String[] args) {
+        BankAccount account = new BankAccount();
+        // Przetestuj działanie
+
+    }
 }
