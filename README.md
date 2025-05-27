@@ -30,3 +30,5 @@ Uzupełnij plik `InputValidatorWithLogging.java`, aby obsługiwał wyjątki i lo
 
 **Polecenie:**
 Zaimplementuj API, szkielet kodu oraz szczegółowe polecenia znajdziesz w pliku `RestApiGlobalExceptionHandling.java`
+
+---
